@@ -1,11 +1,24 @@
 package controllers;
 
-/**
- * Created by Hans Peeter Tulmin on 22.11.2014.
- */
+import java.time.Instant;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import model.ResponseHolder;
 
-import javax.servlet.http.HttpServlet;
+import game.ScalaClass;
 
-@WebServlet(name="hello", urlPatterns="/")
+@Path("/")
 public class HelloScalaServlet {
+
+	@Path("/join")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response joinGame(@QueryParam("name") String name) {
+		Instant begin = Instant.now();
+
+		ScalaClass sc = new ScalaClass();
+		String data = sc.printStuff();
+
+		return Response.ok(new ResponseHolder(begin, data)).build();
+	}
 }

@@ -1,3 +1,6 @@
+package game;
+
+
 /**
  * Created by Hans Peeter Tulmin on 22.11.2014.
  */
