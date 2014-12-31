@@ -17,7 +17,7 @@ public class HelloScalaServlet {
 		Instant begin = Instant.now();
 
 		ScalaClass sc = new ScalaClass();
-		String data = sc.printStuff();
+		String data = sc.helloResponse(name);
 
 		return Response.ok(new ResponseHolder(begin, data)).build();
 	}

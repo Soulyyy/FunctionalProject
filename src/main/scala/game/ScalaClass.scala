@@ -4,8 +4,8 @@ package game;
  */
 class ScalaClass {
 
-  def printStuff(): String = {
-    "Tere, siin on scala"
+  def helloResponse(name: String): String = {
+    "Tere, " + name + ", siin on scala"
   }
 
 }
