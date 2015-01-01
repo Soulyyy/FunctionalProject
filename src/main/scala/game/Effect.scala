@@ -1,31 +1,45 @@
 package game
 
-import model.AsInt
+import model._
 
-abstract class Effect {
-  val effectType: String
-  val eventEffect: EventEffect
-
-}
+abstract class Effect
 
 abstract class EventEffect
 
-class All(filter: Filter, effect: CreatureEffect) extends EventEffect {
-  val this.filter = filter
-  val this.effect = effect
+object EventEffect {
+  val allRegex = "\\(?All \\[(.*?)\\] \\[(.*?)\\]\\)?".r
+  val chooseRegex = "\\(?Choose \\[(.*?)\\] \\[(.*?)\\]\\)?".r
+  val randomRegex = "\\(?Random \\[(.*?)\\] \\[(.*?)\\]\\)?".r
+  val drawCardRegex = "\\(?DrawCard\\)?".r
+
+  val test = "All [] [(Health Relative (-1)), (Attack Relative (-1))]"
+  val testSplit = "\\s*\\d*\\(\\)"
+
+  def unapplySeq(str: String): Option[Seq[EventEffect]] = {
+    None
+  }
+
+  def unapply(str: String): Option[EventEffect] = str match {
+    case allRegex(filter, creatureEffect) => {
+      println("Almost")
+      println("Filter: " + filter)
+      println("CreatureEffect: " + creatureEffect)
+      None
+    }
+    case _ => {
+      println("Nope")
+      None
+    }
+  }
 }
 
-class Choose(filter: Filter, effect: CreatureEffect) extends EventEffect {
-  val this.filter = filter
-  val this.effect = effect
-}
+case class All(filter: Seq[Filter], effect: Seq[CreatureEffect]) extends EventEffect
 
-class Random(filter: Filter, effect: CreatureEffect) extends EventEffect {
-  val this.filter = filter
-  val this.effect = effect
-}
+case class Choose(filter: Seq[Filter], effect: Seq[CreatureEffect]) extends EventEffect
 
-class DrawCard extends EventEffect
+case class Random(filter: Seq[Filter], effect: Seq[CreatureEffect]) extends EventEffect
+
+case class DrawCard() extends EventEffect
 
 abstract class CreatureEffect
 
@@ -35,6 +49,8 @@ object CreatureEffect {
   val tauntRegex = "\\(?Taunt (True|False)\\)?".r
   def unapply(str: String): Option[CreatureEffect] = str match {
     case healthRegex(ChangeType(changeType), AsInt(health)) => Some(Health(changeType, health))
+    case attackRegex(ChangeType(changeType), AsInt(attack)) => Some(Attack(changeType, attack))
+    case tauntRegex(AsBoolean(taunt)) => Some(Taunt(taunt))
     case _ => None
   }
 }
