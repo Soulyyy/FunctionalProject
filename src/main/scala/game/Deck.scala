@@ -1,6 +1,8 @@
 package game
 
+import java.io.FileNotFoundException
 import model.Util
+import scala.io.Source
 
 //Kirjelduses File
 case class Deck(cards: Seq[Card])
@@ -25,5 +27,19 @@ object Deck {
       Some(Deck(cards))
     }
     case _ => None
+  }
+
+  def fromFile(fileName: String): Option[Deck] = {
+    try {
+      val file = Source.fromFile(fileName)
+      val deck = unapply(file.mkString)
+      file.close
+      deck
+    } catch {
+      case ex: FileNotFoundException => {
+        println("File " + fileName + " not found")
+        None
+      }
+    }
   }
 }

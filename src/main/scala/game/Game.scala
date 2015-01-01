@@ -5,7 +5,7 @@ class Game(player1: Player, player2: Player) {
   val board = player1.board
 
   def currentHand(currentPlayer : Player) : String => {
-    return 
+    return
   }
 
   def currentBoard() : String => {

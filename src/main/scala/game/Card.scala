@@ -4,10 +4,12 @@ import model._
 
 abstract class CardType
 
-case class Card(name: String, cost: Int, cardType: CardType)
+case class Card(name: String, cost: Int, cardType: CardType) {
+  var movesLeft = 0
+}
 
 object Card {
-  val cardRegex = "\\(\\\"(.+)\\\"\\s,\\s\\(?(-?\\d+)\\)?\\s,\\s(.*)\\)".r
+  val cardRegex = "\\(\\\"(.+)\\\"\\s+,\\s\\(?(-?\\d+)\\)?\\s+,\\s(.*)\\)".r
 
   val test = """("Gnomish Inventor"
 , 4
