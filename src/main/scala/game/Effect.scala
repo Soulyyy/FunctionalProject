@@ -30,7 +30,6 @@ abstract class EventEffect
 
 object EventEffect {
   val effectRegex = "\\(?(\\S+) \\[(.*?)\\] \\[(.*?)\\]\\)?".r
-  val drawCardRegex = "\\(?DrawCard\\)?".r
 
   /**
    * Expected output
@@ -39,6 +38,7 @@ object EventEffect {
   val test = "All [Any [(Not [(AnyCreature), (AnyHero)]), (Self)]] [(Health Relative (-1)), (Attack Relative (-1))]"
 
   def unapply(str: String): Option[EventEffect] = str match {
+    case Util.literalRegex("DrawCard") => Some(DrawCard())
     case effectRegex(ident, filter, creatureEffect) => {
       val filters = filter.split(Util.arraySplit).map(Filter.unapply).filter(_.isDefined).map(_.get)
       val effects = creatureEffect.split(Util.arraySplit).map(CreatureEffect.unapply).filter(_.isDefined).map(_.get)
@@ -46,7 +46,6 @@ object EventEffect {
         case "All" => Some(All(filters, effects))
         case "Choose" => Some(Choose(filters, effects))
         case "Random" => Some(Random(filters, effects))
-        case Util.literalRegex("DrawCard") => Some(DrawCard())
         case _ => None
       }
     }
