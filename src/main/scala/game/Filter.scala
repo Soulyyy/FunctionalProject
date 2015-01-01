@@ -1,9 +1,10 @@
 package game
 
+import model.Util
+
 abstract class Filter
 
 object Filter {
-	val literalRegex = "\\(?([^)]+)\\)?".r
 	val typeRegex = "\\(?Type \\S*?\\)?".r
 	val notRegex = "\\(?Not \\[(.*)\\]\\)?".r
 	val anyRegex = "\\(?Any \\[(.*)\\]\\)?".r
@@ -11,17 +12,17 @@ object Filter {
 	val test = "Any [(Not [(AnyCreature), (AnyHero)]), (Self)]"
 	
 	def unapply(str:String) : Option[Filter] = str match {
-		case literalRegex("AnyCreature") => Some(AnyCreature())
-		case literalRegex("AnyHero") => Some(AnyHero())
-		case literalRegex("AnyFriendly") => Some(AnyFriendly())
+		case Util.literalRegex("AnyCreature") => Some(AnyCreature())
+		case Util.literalRegex("AnyHero") => Some(AnyHero())
+		case Util.literalRegex("AnyFriendly") => Some(AnyFriendly())
 		case typeRegex(minionType) => Some(Type(minionType))
-		case literalRegex("Self") => Some(Self())
+		case Util.literalRegex("Self") => Some(Self())
 		case notRegex(filter) => {
-				val filters = filter.split(", (?=\\([^\\[\\]]*( \\[.*\\])*\\)$)").map(Filter.unapply).filter(_.isDefined).map(_.get)
+				val filters = filter.split(Util.arraySplit).map(Filter.unapply).filter(_.isDefined).map(_.get)
 				Some(Not(filters))
 		}
 		case anyRegex(filter) => {
-				val filters = filter.split(", (?=\\([^\\[\\]]*( \\[.*\\])*\\)$)").map(Filter.unapply).filter(_.isDefined).map(_.get)
+				val filters = filter.split(Util.arraySplit).map(Filter.unapply).filter(_.isDefined).map(_.get)
 				Some(Any(filters))
 		}
 		case _ => None

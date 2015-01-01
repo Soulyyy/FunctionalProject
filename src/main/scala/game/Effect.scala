@@ -4,30 +4,53 @@ import model._
 
 abstract class Effect
 
+object Effect {
+  val effectRegex = "\\(?(\\S+) \\[(.*?)\\]\\)?".r
+  def unapply(str: String): Option[Effect] = str match {
+    case effectRegex(ident, eventEffect) => {
+      val effects = eventEffect.split(Util.arraySplit).map(EventEffect.unapply).filter(_.isDefined).map(_.get)
+      ident match {
+        case "OnPlay" => Some(OnPlay(effects))
+        case "UntilDeath" => Some(UntilDeath(effects))
+        case "OnDamage" => Some(OnDamage(effects))
+        case "OnDeath" => Some(OnDeath(effects))
+        case _ => None
+      }
+    }
+    case _ => None
+  }
+}
+
+case class OnPlay(effects: Seq[EventEffect]) extends Effect
+case class UntilDeath(effects: Seq[EventEffect]) extends Effect
+case class OnDamage(effects: Seq[EventEffect]) extends Effect
+case class OnDeath(effects: Seq[EventEffect]) extends Effect
+
 abstract class EventEffect
 
 object EventEffect {
-  val allRegex = "\\(?All \\[(.*?)\\] \\[(.*?)\\]\\)?".r
-  val chooseRegex = "\\(?Choose \\[(.*?)\\] \\[(.*?)\\]\\)?".r
-  val randomRegex = "\\(?Random \\[(.*?)\\] \\[(.*?)\\]\\)?".r
+  val effectRegex = "\\(?(\\S+) \\[(.*?)\\] \\[(.*?)\\]\\)?".r
   val drawCardRegex = "\\(?DrawCard\\)?".r
 
-  val test = "All [] [(Health Relative (-1)), (Attack Relative (-1))]"
-  val testSplit = "\\s*\\d*\\(\\)"
-
-  def unapplySeq(str: String): Option[Seq[EventEffect]] = {
-    None
-  }
+  /**
+   * Expected output
+   * Some(All(WrappedArray(Any(WrappedArray(Not(WrappedArray(AnyCreature(), AnyHero())), Self()))),WrappedArray(Health(Relative(),-1), Attack(Relative(),-1))))
+   */
+  val test = "All [Any [(Not [(AnyCreature), (AnyHero)]), (Self)]] [(Health Relative (-1)), (Attack Relative (-1))]"
 
   def unapply(str: String): Option[EventEffect] = str match {
-    case allRegex(filter, creatureEffect) => {
-      println("Almost")
-      println("Filter: " + filter)
-      println("CreatureEffect: " + creatureEffect)
-      None
+    case effectRegex(ident, filter, creatureEffect) => {
+      val filters = filter.split(Util.arraySplit).map(Filter.unapply).filter(_.isDefined).map(_.get)
+      val effects = creatureEffect.split(Util.arraySplit).map(CreatureEffect.unapply).filter(_.isDefined).map(_.get)
+      ident match {
+        case "All" => Some(All(filters, effects))
+        case "Choose" => Some(Choose(filters, effects))
+        case "Random" => Some(Random(filters, effects))
+        case Util.literalRegex("DrawCard") => Some(DrawCard())
+        case _ => None
+      }
     }
     case _ => {
-      println("Nope")
       None
     }
   }
@@ -47,6 +70,7 @@ object CreatureEffect {
   val healthRegex = "\\(?Health (\\S*?) \\(?(-?\\d+)\\)?\\)?".r
   val attackRegex = "\\(?Attack (\\S*?) \\(?(-?\\d+)\\)?\\)?".r
   val tauntRegex = "\\(?Taunt (True|False)\\)?".r
+
   def unapply(str: String): Option[CreatureEffect] = str match {
     case healthRegex(ChangeType(changeType), AsInt(health)) => Some(Health(changeType, health))
     case attackRegex(ChangeType(changeType), AsInt(attack)) => Some(Attack(changeType, attack))
@@ -65,8 +89,8 @@ abstract class ChangeType
 
 object ChangeType {
   def unapply(str: String): Option[ChangeType] = str match {
-    case "Relative" => Some(Relative())
-    case "Absolute" => Some(Absolute())
+    case Util.literalRegex("Relative") => Some(Relative())
+    case Util.literalRegex("Absolute") => Some(Absolute())
     case _ => None
   }
 }

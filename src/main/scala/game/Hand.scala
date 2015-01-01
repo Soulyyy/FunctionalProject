@@ -1,5 +1,3 @@
 package game
 
-class Hand {
-
-}
+class Hand
