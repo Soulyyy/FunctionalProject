@@ -4,7 +4,7 @@
 
 ("Elven Archer"
 , 4
-, MinionCard [OnPlay [Choose [] [Health Relative (-1)]]] 4 5 False Nothing),
+, MinionCard [OnPlay [Choose [Not [(AnyHero), (AnyFriendly)]] [Health Relative (-1)]]] 4 5 False Nothing),
 
 ("Gnomish Inventor"
 , 4

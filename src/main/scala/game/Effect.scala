@@ -10,15 +10,15 @@ object Effect {
   val effectRegex = "\\(?(\\S+) \\[(.*?)\\]\\)?".r
   def unapply(str: String): Option[Effect] = str match {
     case effectRegex(ident, eventEffect) => {
-      val effects = eventEffect.split(Util.arraySplit).map(EventEffect.unapply).filter(_.isDefined).map(_.get)
+      val effects = Util.parseArray(eventEffect).map(EventEffect.unapply).filter(_.isDefined).map(_.get)
       ident match {
         case "OnPlay" => Some(OnPlay(effects))
         case "UntilDeath" => Some(UntilDeath(effects))
         case "OnDamage" => Some(OnDamage(effects))
         case "OnDeath" => Some(OnDeath(effects))
         case _ => None
-      }
     }
+      }
     case _ => None
   }
 }
@@ -39,20 +39,22 @@ object EventEffect {
    */
   val test = "All [Any [(Not [(AnyCreature), (AnyHero)]), (Self)]] [(Health Relative (-1)), (Attack Relative (-1))]"
 
-  def unapply(str: String): Option[EventEffect] = str match {
-    case Util.literalRegex("DrawCard") => Some(DrawCard())
-    case effectRegex(ident, filter, creatureEffect) => {
-      val filters = filter.split(Util.arraySplit).map(Filter.unapply).filter(_.isDefined).map(_.get)
-      val effects = creatureEffect.split(Util.arraySplit).map(CreatureEffect.unapply).filter(_.isDefined).map(_.get)
-      ident match {
-        case "All" => Some(All(filters, effects))
-        case "Choose" => Some(Choose(filters, effects))
-        case "Random" => Some(Random(filters, effects))
-        case _ => None
+  def unapply(str: String): Option[EventEffect] = {
+    str match {
+      case Util.literalRegex("DrawCard") => Some(DrawCard())
+      case effectRegex(ident, filter, creatureEffect) => {
+        val filters = Util.parseArray(filter).map(Filter.unapply).filter(_.isDefined).map(_.get)
+        val effects = Util.parseArray(creatureEffect).map(CreatureEffect.unapply).filter(_.isDefined).map(_.get)
+        ident match {
+          case "All" => Some(All(filters, effects))
+          case "Choose" => Some(Choose(filters, effects))
+          case "Random" => Some(Random(filters, effects))
+          case _ => None
+        }
       }
-    }
-    case _ => {
-      None
+      case _ => {
+        None
+      }
     }
   }
 }

@@ -31,11 +31,11 @@ object CardType {
 
   def unapply(str: String): Option[CardType] = str match {
     case spellCardRegex(effect) => {
-      val effects = effect.split(Util.arraySplit).map(Effect.unapply).filter(_.isDefined).map(_.get)
+      val effects = Util.parseArray(effect).map(Effect.unapply).filter(_.isDefined).map(_.get)
       Some(SpellCard(effects))
     }
     case minionCardRegex(effect, AsInt(health), AsInt(attack), AsBoolean(taunt), _, minionType) => {
-      val effects = effect.split(Util.arraySplit).map(Effect.unapply).filter(_.isDefined).map(_.get)
+      val effects = Util.parseArray(effect).map(Effect.unapply).filter(_.isDefined).map(_.get)
       val mt = minionType match { case "Nothing" => ""; case typeStr => typeStr }
       Some(MinionCard(effects, health, attack, taunt, mt))
     }
