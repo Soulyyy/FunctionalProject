@@ -52,9 +52,19 @@ object Util {
     }
     println("Hand:\n" + hand.map(_.getMinionDisplay).mkString(" "))
 
-    //Get IO
+    val choice = Console.readLine.toInt
 
-    hand(0)
+    val all = hand ++ ownMinions ++ enemyMinions
+
+    val card = all.filter(_.id == choice)
+
+    if (!card.exists(_.id == choice)) {
+      println("Invalid Choice")
+    } else {
+      println("Card chosen: " + card(0).getMinionDisplay)
+    }
+
+    card(0)
   }
 }
 

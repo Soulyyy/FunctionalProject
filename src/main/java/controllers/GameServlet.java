@@ -1,5 +1,8 @@
 package controllers;
 
+import game.Deck;
+import game.Game;
+import game.Player;
 import java.time.Instant;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
