@@ -23,6 +23,25 @@ class Game(player1: Player, player2: Player) {
     val handSize = opponent.hand.getSize
     handSize
   }
+
+  def currentBoard: String = {
+    "tere"
+  }
+
+/*  def play = {
+    while(true) {
+      currentPlayer.drawCard()
+      var input : Int =scala.io.StdIn.readInt()
+      while(input != 700) {
+        input  = scala.io.StdIn.readInt()
+        println(state)
+
+
+      }
+    }
+  }*/
+
+
 }
 
 //For testing
