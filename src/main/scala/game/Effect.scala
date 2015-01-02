@@ -2,7 +2,9 @@ package game
 
 import model._
 
-abstract class Effect
+sealed trait Effect {
+  def effects: Seq[EventEffect]
+}
 
 object Effect {
   val effectRegex = "\\(?(\\S+) \\[(.*?)\\]\\)?".r
@@ -63,7 +65,7 @@ case class Random(filter: Seq[Filter], effect: Seq[CreatureEffect]) extends Even
 
 case class DrawCard() extends EventEffect
 
-abstract class CreatureEffect
+sealed trait CreatureEffect
 
 object CreatureEffect {
   val healthRegex = "\\(?Health (\\S*?) \\(?(-?\\d+)\\)?\\)?".r

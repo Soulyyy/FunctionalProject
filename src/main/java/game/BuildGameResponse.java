@@ -1,32 +1,51 @@
 package game;
 
 import java.util.List;
+
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import scala.collection.JavaConversions;
 
 /**
  * Created by Hans on 2.01.2015.
- *
+ * <p/>
  * Class for building JSON Strings to represent the board
  */
 public class BuildGameResponse {
 
-	public String buildhand(Hand hand) {
+	public static JSONArray buildHand(Hand hand) throws JSONException {
 		//Hand hand = new Hand();
-		for(Card s : JavaConversions.asJavaIterable(hand.getHand())) {
+		JSONArray list = new JSONArray();
+		for (Card card : JavaConversions.asJavaIterable(hand.getHand())) {
+			list.put(buildCard(card));
 
 		}
+		return list;
 
 	}
 
-	public String buildCard(){
+	public static JSONObject buildCard(Card card) throws JSONException {
+		JSONObject resp = new JSONObject();
+		resp.put("name", card.name());
+		resp.put("cost", card.cost());
+		resp.put("type", card.cardType());
+		return resp;
+
 
 	}
 
 	public String buildBoard() {
-
+		return "tere";
 	}
 
-	public String buildGame(){
-
+	public static JSONObject buildGame(Game game) throws JSONException {
+		JSONObject resp = new JSONObject();
+		resp.put("hand", buildHand(game.currentPlayer().hand()));
+		resp.put("lifeTotal", game.currentPlayer().health());
+		resp.put("opponentLife", game.opponent().health());
+		resp.put("opponentHandSize", game.opponent().hand().getSize());
+		//resp.put("playerBoard",game.currentPlayer().)
+		return resp;
 	}
 }

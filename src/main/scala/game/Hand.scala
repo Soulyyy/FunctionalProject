@@ -3,7 +3,8 @@ package game
 import scala.collection.mutable.ListBuffer
 
 class Hand {
-  ListBuffer[Card] hand;
+  var hand : ListBuffer[Card] = new ListBuffer[Card]
+  //var ListBuffer hand = new ListBuffer[Card]
 
   def getHand: ListBuffer[Card] = {
     hand
@@ -20,5 +21,9 @@ class Hand {
 
   def playCard(card : Card) = {
     hand-=card
+  }
+
+  def getSize : Int = {
+    hand.size
   }
 }

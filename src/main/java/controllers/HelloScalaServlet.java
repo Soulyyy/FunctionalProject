@@ -7,7 +7,7 @@ import model.ResponseHolder;
 
 import game.ScalaClass;
 
-@Path("/")
+@Path("/terescala")
 public class HelloScalaServlet {
 
 	@Path("/join")
