@@ -1,3 +1,0 @@
-package game
-
-class Hand
