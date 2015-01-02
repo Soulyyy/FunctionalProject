@@ -7,11 +7,22 @@ sealed trait CardType {
 }
 
 case class Card(name: String, cost: Int, cardType: CardType) {
+  Card.idCounter += 1
+  val id = Card.idCounter
   var movesLeft = 0
+
+  def getMinionCard(): MinionCard = cardType.asInstanceOf[MinionCard]
+
+  def getMinionDisplay(): (Int, String, Int, Int, Int) = {
+    val minion = getMinionCard
+    (id, name, cost, minion.getAttack, minion.getHealth)
+  }
 }
 
 object Card {
   val cardRegex = "\\(\\\"(.+)\\\"\\s+,\\s\\(?(-?\\d+)\\)?\\s+,\\s(.*)\\)".r
+
+  var idCounter = 0
 
   val test = """("Gnomish Inventor"
 , 4

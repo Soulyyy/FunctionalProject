@@ -23,26 +23,7 @@ class Game(player1: Player, player2: Player) {
     val handSize = opponent.hand.getSize
     handSize
   }
-
-  def currentBoard: String = {
-    "tere"
-
-
-    def main(args : Array[String]) = {
-      while(true) {
-        currentPlayer.startTurn()
-        while(true) {
-         var action =
-
-
-        }
-      }
-    }
-  }
-
-
 }
-
 
 //For testing
 object Game {

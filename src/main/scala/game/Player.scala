@@ -3,25 +3,20 @@ package game
 import scala.collection.mutable._
 
 class Player(name: String, deck: Deck) {
-  var health: Int = 30
-  var maxMana : Int = 0
-  var mana: Int = 1
-  var overload : Int =0
-  //var maxMana: Int = 1
-  //var mana: Int = 1
+  var maxMana: Int = 0
+  var mana: Int = 0
+  var overload: Int = 0
   var fatigue: Int = 1
   val cards = deck.cards.to[ArrayStack]
   val hand = new Hand
   val board = new ListBuffer[Card]
+  board += new Card(name, 0, new MinionCard(Seq(), 30, 0, false, "Hero"))
 
   val deathQueue = new Queue[Card]
 
-/*  def drawCard(): Card = {
-    val drawCard = cards.pop
-    hand.addCard(drawCard)
-    drawCard
-    board += new Card(name, 0, new MinionCard(Seq(), 30, 0, false, "Hero"))
-  }*/
+  def getHealth(): Int = {
+    board(0).cardType.asInstanceOf[MinionCard].getHealth
+  }
 
   def popDeathQueue(): Unit = {
     deathQueue.foreach(card => {
@@ -74,7 +69,7 @@ class Player(name: String, deck: Deck) {
     popDeathQueue
   }
 
-  def endTurn : Boolean = {
+  def endTurn: Boolean = {
     true
   }
 
@@ -89,11 +84,15 @@ class Player(name: String, deck: Deck) {
       val (own, enemy) = Filter.filter(filters, source, Game.player1, Game.player2)
       println("Target candidates:\nOwn: " + own.mkString + "\nEnemy:" + enemy.mkString)
     }
-    case Random(filters, effects) => println("Effect random creature")
+    case Random(filters, effects) => {
+      println("Effect random creature")
+      val (own, enemy) = Filter.filter(filters, source, Game.player1, Game.player2)
+      println("Target candidates:\nOwn: " + own.mkString + "\nEnemy:" + enemy.mkString)
+    }
   }
 
   def startTurn(): Unit = {
-    if(maxMana<=10) maxMana+=1
+    if (maxMana <= 10) maxMana += 1
     mana = maxMana - overload
     overload = 0
     drawCard()

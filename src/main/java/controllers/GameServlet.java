@@ -8,14 +8,11 @@ import game.Deck;
 import game.Game;
 import game.Player;
 import model.ResponseHolder;
-import game.BuildGameResponse;
-import org.codehaus.jettison.json.JSONException;
-
+import model.GameDisplay;
 
 /**
  * Created by Hans on 1.01.2015.
  */
-
 @Path("/")
 public class GameServlet {
 
@@ -27,15 +24,18 @@ public class GameServlet {
 		//Deck deck = new Deck(Deck.unapply(Deck.fromFile("deck.txt")));
 		Player p1 = new Player("p1", Deck.fromFile("deck.txt").get());
 		Player p2 = new Player("p2", Deck.fromFile("deck.txt").get());
-		Game game = new Game(p1,p2);
-		String resp;
-		try {
-			resp = BuildGameResponse.buildGame(game).toString();
-		} catch (JSONException e) {
-			resp ="Failure";
-		}
-		System.out.println(resp);
-		return Response.ok(new ResponseHolder(begin, resp)).build();
+		Game game = new Game(p1, p2);
+
+		game.currentPlayer().startTurn();
+		game.opponent().startTurn();
+		game.currentPlayer().startTurn();
+		game.opponent().startTurn();
+		game.currentPlayer().startTurn();
+		game.opponent().startTurn();
+		game.currentPlayer().startTurn();
+		game.currentPlayer().playCard(1);
+
+		return Response.ok(new ResponseHolder(begin, new GameDisplay(game))).build();
 	}
 
 	@Path("/move")

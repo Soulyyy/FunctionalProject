@@ -17,7 +17,7 @@ public class BuildGameResponse {
 	public static JSONArray buildHand(Hand hand) throws JSONException {
 		//Hand hand = new Hand();
 		JSONArray list = new JSONArray();
-		for (Card card : JavaConversions.asJavaIterable(hand.getHand())) {
+		for(Card card : JavaConversions.asJavaIterable(hand.getHand())) {
 			list.put(buildCard(card));
 
 		}
@@ -32,7 +32,6 @@ public class BuildGameResponse {
 		resp.put("type", card.cardType());
 		return resp;
 
-
 	}
 
 	public String buildBoard() {
@@ -42,8 +41,8 @@ public class BuildGameResponse {
 	public static JSONObject buildGame(Game game) throws JSONException {
 		JSONObject resp = new JSONObject();
 		resp.put("hand", buildHand(game.currentPlayer().hand()));
-		resp.put("lifeTotal", game.currentPlayer().health());
-		resp.put("opponentLife", game.opponent().health());
+		resp.put("lifeTotal", game.currentPlayer().getHealth());
+		resp.put("opponentLife", game.opponent().getHealth());
 		resp.put("opponentHandSize", game.opponent().hand().getSize());
 		//resp.put("playerBoard",game.currentPlayer().)
 		return resp;
