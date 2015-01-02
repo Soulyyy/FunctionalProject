@@ -4,16 +4,18 @@ import scala.collection.mutable._
 
 class Player(name: String, deck: Deck) {
   var health: Int = 30
+  var maxMana : Int = 0
   var mana: Int = 1
+  var overload : Int =0
   val cards = deck.cards.to[ArrayStack]
-  val hand = new ListBuffer[Card]
+  val hand = new Hand
   val board = new ListBuffer[Card]
 
   board += new Card(name, 0, new MinionCard(null, 30, 0, false, "Hero"))
 
   def drawCard(): Card = {
     val drawCard = cards.pop
-    hand += drawCard
+    hand.addCard(drawCard)
     drawCard
   }
 
@@ -34,6 +36,9 @@ class Player(name: String, deck: Deck) {
   }
 
   def startTurn(): Unit = {
+    if(maxMana<=10) maxMana+=1
+    mana = maxMana - overload
+    overload = 0
     drawCard()
 
     //Reset move counters
