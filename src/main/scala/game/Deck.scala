@@ -21,12 +21,9 @@ object Deck {
 , 4
 , MinionCard [OnPlay [DrawCard]] 2 4 False Nothing)]"""
 
-  def unapply(str: String): Option[Deck] = str match {
-    case arrayRegex(deck) => {
-      val cards = deck.split(Util.arraySplit).map(Card.unapply).filter(_.isDefined).map(_.get)
-      Some(Deck(cards))
-    }
-    case _ => None
+  def unapply(str: String): Option[Deck] = {
+    val cards = Util.parseArray(str.stripPrefix("[").stripSuffix("]").trim).map(Card.unapply).filter(_.isDefined).map(_.get)
+    Some(Deck(cards))
   }
 
   def fromFile(fileName: String): Option[Deck] = {

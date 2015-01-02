@@ -10,18 +10,21 @@ class Player(name: String, deck: Deck) {
   val hand = new ListBuffer[Card]
   val board = new ListBuffer[Card]
 
-  val deathQueue = new Queue[MinionCard]
+  val deathQueue = new Queue[Card]
 
   board += new Card(name, 0, new MinionCard(Seq(), 30, 0, false, "Hero"))
 
   def popDeathQueue(): Unit = {
-    deathQueue.foreach(minion => {
+    deathQueue.foreach(card => {
+      val minion = card.cardType.asInstanceOf[MinionCard]
       if (minion.minionType == "Hero") {
         println(name + " lost")
-      } else if (!minion.effects.filter(_.isInstanceOf[OnDeath]).isEmpty) {
+      } else if (!minion.effects.filter(f => f.isInstanceOf[OnDeath] || f.isInstanceOf[UntilDeath]).isEmpty) {
         println("Deathrattle: " + minion.effects.filter(_.isInstanceOf[OnDeath]))
+        println("End of aura: " + minion.effects.filter(_.isInstanceOf[UntilDeath]))
       }
     })
+    deathQueue.foreach(minion => board -= minion)
     deathQueue.clear
   }
 
@@ -32,7 +35,7 @@ class Player(name: String, deck: Deck) {
 
       //Do not pop death queue in this method
       change match {
-        case Some(Killed()) => deathQueue += board(0).cardType.asInstanceOf[MinionCard]
+        case Some(Killed()) => deathQueue += board(0)
         case _ =>
       }
 
@@ -51,27 +54,35 @@ class Player(name: String, deck: Deck) {
     hand.remove(index)
     mana -= card.cost
 
-    card.cardType.effects.filter(_.isInstanceOf[OnPlay]).flatMap(_.effects).foreach(f => {
+    card.cardType.effects.filter(f => f.isInstanceOf[OnPlay] || f.isInstanceOf[UntilDeath]).flatMap(_.effects).foreach(f => {
       println("Battlecry: " + f)
-      applyEffect(f)
+      applyEffect(f, card)
     })
-    popDeathQueue
-
     if (card.cardType.isInstanceOf[MinionCard]) {
       board += card
     }
+    popDeathQueue
   }
 
-  def applyEffect(effect: EventEffect): Unit = effect match {
+  def applyEffect(effect: EventEffect, source: Card): Unit = effect match {
     case DrawCard() => drawCard
-    case All(filters, effects) => println("Effect all creatures")
-    case Choose(filters, effects) => println("Effect chosen creature")
+    case All(filters, effects) => {
+      println("Effect all creatures")
+
+    }
+    case Choose(filters, effects) => {
+      println("Effect chosen creature")
+      val (own, enemy) = Filter.filter(filters, source, Game.player1, Game.player2)
+      println("Target candidates:\nOwn: " + own.mkString + "\nEnemy:" + enemy.mkString)
+    }
     case Random(filters, effects) => println("Effect random creature")
   }
 
   def startTurn(): Unit = {
     if (maxMana != 10) maxMana += 1
     mana = maxMana
+    println("Your turn")
+    println("Mana: " + mana)
 
     drawCard
     popDeathQueue
