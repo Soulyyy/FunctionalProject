@@ -26,19 +26,20 @@ class Game(player1: Player, player2: Player) {
 
   def currentBoard: String = {
     "tere"
+  }
+
+/*  def play = {
+    while(true) {
+      currentPlayer.drawCard()
+      var input : Int =scala.io.StdIn.readInt()
+      while(input != 700) {
+        input  = scala.io.StdIn.readInt()
+        println(state)
 
 
-    def main(args : Array[String]) = {
-      while(true) {
-        currentPlayer.startTurn()
-        while(true) {
-         var action =
-
-
-        }
       }
     }
-  }
+  }*/
 
 
 }

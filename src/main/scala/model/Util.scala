@@ -38,6 +38,13 @@ object Util {
     res += cur.mkString
     res.toList
   }
+
+  def choose(hand : Seq) : Unit = {
+    var i=0
+    for(i <- 0 to hand.length) {
+      println(i+ " "+ hand(i))
+    }
+  }
 }
 
 object AsInt {

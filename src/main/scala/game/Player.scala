@@ -16,12 +16,16 @@ class Player(name: String, deck: Deck) {
 
   val deathQueue = new Queue[Card]
 
+  def getHealth(): Int = {
+    board(0).cardType.asInstanceOf[MinionCard].getHealth
+  }
+
 /*  def drawCard(): Card = {
     val drawCard = cards.pop
     hand.addCard(drawCard)
     drawCard
-    board += new Card(name, 0, new MinionCard(Seq(), 30, 0, false, "Hero"))
   }*/
+    board += new Card(name, 0, new MinionCard(Seq(), 30, 0, false, "Hero"))
 
   def popDeathQueue(): Unit = {
     deathQueue.foreach(card => {
