@@ -14,13 +14,13 @@ public class GameDisplay {
 
 	public GameDisplay(Game game) {
 		List<CardDisplay> cards = new ArrayList<>();
-		for(Card c : JavaConversions.asJavaIterable(game.currentPlayer().hand().hand())) {
+		for(Card c : JavaConversions.asJavaIterable(game.currentPlayer().hand().values())) {
 			cards.add(new CardDisplay(c));
 		}
 		hand = cards.toArray(new CardDisplay[0]);
 		lifeTotal = game.currentPlayer().getHealth();
 		opponentLife = game.opponent().getHealth();
-		opponentHandSize = game.opponent().hand().getSize();
+		opponentHandSize = game.opponent().hand().size();
 	}
 
 	public CardDisplay[] getHand() {

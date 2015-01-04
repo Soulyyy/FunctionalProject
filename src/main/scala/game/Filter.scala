@@ -41,10 +41,10 @@ object Filter {
   }
   
   def filter(filters:Seq[Filter], source:Card, self:Player, other:Player): (Seq[Card], Seq[Card]) = {
-    (self.board.filter(minion => {
+    (self.board.values.toSeq.filter(minion => {
       applyFilters(filters, source, minion, self, other, true).find(!_) == None
     }),
-    other.board.filter(minion => {
+    other.board.values.toSeq.filter(minion => {
       applyFilters(filters, source, minion, self, other, false).find(!_) == None
     }))
   }

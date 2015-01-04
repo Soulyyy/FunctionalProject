@@ -2,25 +2,24 @@ package game
 
 class Game(player1: Player, player2: Player) {
 
-  var currentPlayer: Player = player1
-  var opponent: Player = player2
-  //val hand = player1.hand
-  val board = player1.board
+  var currentPlayer = player1
+  var opponent = player2
+  var gameOver = false
 
-  def switchPriority = {
-    val tmp: Player = currentPlayer
+  private def switchPriority = {
+    val tmp = currentPlayer
     currentPlayer = opponent
     opponent = tmp
   }
 
-  def currentHand(currentPlayer: Player): String = {
+  def currentHand(): String = {
     var hand = currentPlayer.hand
 
     "tere"
   }
 
-  def opponentHandSize(opponent: Player): Int = {
-    val handSize = opponent.hand.getSize
+  def opponentHandSize(): Int = {
+    val handSize = opponent.hand.size
     handSize
   }
 
@@ -28,7 +27,7 @@ class Game(player1: Player, player2: Player) {
     "tere"
   }
 
-/*  def play = {
+  /*  def play = {
     while(true) {
       currentPlayer.drawCard()
       var input : Int =scala.io.StdIn.readInt()
@@ -41,11 +40,34 @@ class Game(player1: Player, player2: Player) {
     }
   }*/
 
+  def endTurn(): Unit = {
+    switchPriority
+    currentPlayer.startTurn
+  }
 
+  def start(): Unit = {
+    currentPlayer.startTurn
+    while (!gameOver) {
+      switchPriority
+      currentPlayer.startTurn
+    }
+  }
+
+  def end(): Unit = gameOver = true
 }
 
 //For testing
 object Game {
   val player1 = new Player("Player1", Deck.fromFile("deck.txt").get)
   val player2 = new Player("Player2", Deck.fromFile("deck.txt").get)
+
+  val game = new Game(player1, player2)
+
+  def apply(): Game = {
+    game
+  }
+
+  def main(args: Array[String]) = {
+    game.start
+  }
 }

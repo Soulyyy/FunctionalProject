@@ -17,6 +17,20 @@ case class Card(name: String, cost: Int, cardType: CardType) {
     val minion = getMinionCard
     (id, name, cost, minion.getAttack, minion.getHealth)
   }
+
+  override def toString(): String = {
+    if (cardType.isInstanceOf[MinionCard]) {
+      val mc = cardType.asInstanceOf[MinionCard]
+      val str = "(" + id + "):(" + name + ", Cost:" + cost + ", Att:" + mc.getAttack + ", Hp:" + mc.getHealth
+      if (mc.taunt) {
+        str + ", Taunt)"
+      } else {
+        str + ")"
+      }
+    } else {
+      "(" + id + "):(" + name + ", Cost:" + cost + ")"
+    }
+  }
 }
 
 object Card {

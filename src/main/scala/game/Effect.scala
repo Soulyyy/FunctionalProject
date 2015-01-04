@@ -67,7 +67,32 @@ case class Random(filter: Seq[Filter], effect: Seq[CreatureEffect]) extends Even
 
 case class DrawCard() extends EventEffect
 
-sealed trait CreatureEffect
+sealed trait CreatureEffect {
+  def applyOn(card: Card) = {
+    if (!card.cardType.isInstanceOf[MinionCard]) {
+      throw new IllegalArgumentException("CreatureEffect can only be applied on creatures")
+    }
+    val minion = card.cardType.asInstanceOf[MinionCard]
+    this match {
+      case Health(changeType: ChangeType, change: Int) => {
+        changeType match {
+          case Relative() => minion.relativeHp(change)
+          case Absolute() => minion.setHp(change)
+        }
+        //Where to resolve events?
+      }
+      case Attack(changeType: ChangeType, change: Int) => {
+        changeType match {
+          case Relative() => minion.relativeHp(change)
+          case Absolute() => minion.setHp(change)
+        }
+      }
+      case Taunt(taunt: Boolean) => {
+        minion.taunt = taunt
+      }
+    }
+  }
+}
 
 object CreatureEffect {
   val healthRegex = "\\(?Health (\\S*?) \\(?(-?\\d+)\\)?\\)?".r

@@ -2,6 +2,7 @@ package model
 
 import game.Card
 import scala.collection.mutable.MutableList
+import scala.util.Random
 
 object Util {
   val literalRegex = "\\(?([^)]+)\\)?".r
@@ -42,29 +43,43 @@ object Util {
     res.toList
   }
 
-  def playerInput(str: String, hand: Seq[Card], ownMinions: Seq[Card], enemyMinions: Seq[Card]): Card = {
-    println(str)
+  def playerInput(str: String, hand: Seq[Card], ownMinions: Seq[Card], enemyMinions: Seq[Card]): Option[Card] = {
+    val all = hand ++ ownMinions ++ enemyMinions
+    if (all.isEmpty) {
+      None
+    }
+
     if (!enemyMinions.isEmpty) {
-      println("Enemy Board:\n" + enemyMinions.map(_.getMinionDisplay).mkString(" "))
+      println("Enemy Board:\n" + enemyMinions.map(_.toString).mkString("\n"))
     }
     if (!ownMinions.isEmpty) {
-      println("Own Board:\n" + ownMinions.map(_.getMinionDisplay).mkString(" "))
+      println("Own Board:\n" + ownMinions.map(_.toString).mkString("\n"))
     }
-    println("Hand:\n" + hand.map(_.getMinionDisplay).mkString(" "))
+    if (!hand.isEmpty) {
+      println("Hand:\n" + hand.map(_.toString).mkString("\n"))
+    }
 
-    val choice = Console.readLine.toInt
-
-    val all = hand ++ ownMinions ++ enemyMinions
+    print(str)
+    val choice = io.StdIn.readInt
 
     val card = all.filter(_.id == choice)
 
     if (!card.exists(_.id == choice)) {
       println("Invalid Choice")
+      None
     } else {
-      println("Card chosen: " + card(0).getMinionDisplay)
+      Some(card(0))
+    }
+  }
+
+  def randomInput(hand: Seq[Card], ownMinions: Seq[Card], enemyMinions: Seq[Card]): Option[Card] = {
+    val all = hand ++ ownMinions ++ enemyMinions
+    if (all.isEmpty) {
+      None
     }
 
-    card(0)
+    val shuffled = Random.shuffle(all)
+    Some(shuffled(0))
   }
 }
 
