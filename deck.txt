@@ -1,11 +1,19 @@
 [ ("Boulderfist Ogre"
-, 6
-, MinionCard [] 6 7 False Nothing),
+, 1
+, MinionCard [] 7 6 False Nothing),
+
+("Senjin shieldmasta"
+, 1
+, MinionCard [] 5 3 True Nothing),
 
 ("Elven Archer"
-, 4
-, MinionCard [OnPlay [Choose [Not [(AnyHero), (AnyFriendly)]] [Health Relative (-1)]]] 4 5 False Nothing),
+, 1
+, MinionCard [OnPlay [Choose [] [Health Relative (-1)]]] 1 1 False Nothing),
 
 ("Gnomish Inventor"
-, 4
-, MinionCard [OnPlay [DrawCard]] 2 4 False Nothing)]
+, 1
+, MinionCard [OnPlay [DrawCard]] 4 2 False Nothing),
+
+("Stormwind Champion"
+, 1
+, MinionCard [UntilDeath [All [(AnyFriendly), (AnyCreature), (Not [Self])] [(Health Relative 1), (Attack Relative 1)]] 6 6 False Nothing)]

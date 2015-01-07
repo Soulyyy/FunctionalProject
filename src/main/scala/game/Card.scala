@@ -1,36 +1,27 @@
 package game
 
 import model._
+import scala.collection.mutable.ArrayBuffer
 
 sealed trait CardType {
+  var _parent: Option[Card] = None
+
+  def parent = _parent.get
+
+  def id = parent.id
+  def name = parent.name
+  def cost = parent.cost
+
   def effects: Seq[Effect]
 }
 
 case class Card(name: String, cost: Int, cardType: CardType) {
   Card.idCounter += 1
   val id = Card.idCounter
-  var movesLeft = 0
 
-  def getMinionCard(): MinionCard = cardType.asInstanceOf[MinionCard]
+  cardType._parent = Some(this)
 
-  def getMinionDisplay(): (Int, String, Int, Int, Int) = {
-    val minion = getMinionCard
-    (id, name, cost, minion.getAttack, minion.getHealth)
-  }
-
-  override def toString(): String = {
-    if (cardType.isInstanceOf[MinionCard]) {
-      val mc = cardType.asInstanceOf[MinionCard]
-      val str = "(" + id + "):(" + name + ", Cost:" + cost + ", Att:" + mc.getAttack + ", Hp:" + mc.getHealth
-      if (mc.taunt) {
-        str + ", Taunt)"
-      } else {
-        str + ")"
-      }
-    } else {
-      "(" + id + "):(" + name + ", Cost:" + cost + ")"
-    }
-  }
+  override def toString() = cardType.toString
 }
 
 object Card {
@@ -68,46 +59,87 @@ object CardType {
   }
 }
 
-sealed trait Change
-case class Killed() extends Change
-case class Damaged() extends Change
-
 case class MinionCard(effects: Seq[Effect], private var health: Int, private var attack: Int, var taunt: Boolean, minionType: String) extends CardType {
   private var dynHealth = 0
   private var dynAttack = 0
+  var dynTaunt = taunt
+  var movesLeft = 0
 
-  def relativeHp(change: Int): Option[Change] = {
-    //Killed only on first change to negative, avoid multiple deathreattle
-    if (health + dynHealth > 0 && health + dynHealth + change > 0) {
-      health += change
-      if (change < 0) {
-        Some(Damaged())
-      } else {
-        None
-      }
-    } else {
-      health += change
-      Some(Killed())
+  val damageEffects = new ArrayBuffer[() => Unit]
+  val deathEffects = new ArrayBuffer[() => Unit]
+
+  var owner: Option[Player] = None
+
+  def relativeHp(change: Int): Unit = {
+    if (owner == None) {
+      throw new IllegalStateException("Card must have owner")
     }
+    //Killed only on first change to negative, avoid multiple deathreattle
+    if (change < 0) {
+      Game().damageQueue += this
+      if (getHealth <= 0) {
+        Game().deathQueue += this
+      }
+    }
+    dynHealth += change
+  }
+
+  //Heal & buff removal
+  def buffHp(change: Int): Unit = {
+    if (owner == None) {
+      throw new IllegalStateException("Card must have owner")
+    }
+
   }
 
   def relativeAtt(change: Int): Unit = {
-    attack += math.max(change, 0)
+    if (owner == None) {
+      throw new IllegalStateException("Card must have owner")
+    }
+    dynAttack += change
   }
 
   //Do not update aoe buff on absolute change, ie 2/2 + stormwind + equality = 3/2
   def setHp(hp: Int): Unit = {
     if (hp < 0) throw new IllegalArgumentException("Absolute change must be positive")
+    if (owner == None) {
+      throw new IllegalStateException("Card must have owner")
+    }
     health = hp
   }
 
   def setAtt(att: Int): Unit = {
     if (att < 0) throw new IllegalArgumentException("Absolute change must be positive")
+    if (owner == None) {
+      throw new IllegalStateException("Card must have owner")
+    }
     attack = att
   }
 
   def getHealth(): Int = health + dynHealth
-  def getAttack(): Int = attack + dynAttack
+  def getAttack(): Int = math.max(attack + dynAttack, 0)
+  def getTaunt(): Boolean = dynTaunt
+
+  override def toString(): String = {
+    val str = "(" + parent.id + "):(" + parent.name + ", Cost:" + parent.cost + ", Att:" + getAttack + ", Hp:" + getHealth
+    if (getTaunt) {
+      str + ", Taunt)"
+    } else {
+      str + ")"
+    }
+  }
+
+  def onDamage(): Unit = {
+    damageEffects.foreach(_())
+  }
+
+  def onDeath(): Unit = {
+    deathEffects.foreach(_())
+  }
 }
 
-case class SpellCard(effects: Seq[Effect]) extends CardType
+case class SpellCard(effects: Seq[Effect]) extends CardType {
+  override def toString(): String = {
+    "(" + parent.id + "):(" + parent.name + ", Cost:" + parent.cost + ")"
+  }
+}

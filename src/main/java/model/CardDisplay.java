@@ -12,8 +12,8 @@ public class CardDisplay {
 	public CardDisplay(Card card) {
 		name = card.name();
 		manaCost = card.cost();
-		attack = card.getMinionCard().getAttack();
-		health = card.getMinionCard().getHealth();
+		attack = 0;
+		health = 0;
 	}
 
 	public String getName() {

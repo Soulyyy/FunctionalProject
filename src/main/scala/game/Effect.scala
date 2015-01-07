@@ -28,7 +28,43 @@ case class UntilDeath(effects: Seq[EventEffect]) extends Effect
 case class OnDamage(effects: Seq[EventEffect]) extends Effect
 case class OnDeath(effects: Seq[EventEffect]) extends Effect
 
-abstract class EventEffect
+sealed trait EventEffect {
+
+  //Apply and return method that reverses
+  def applyOn(source: Card): () => Unit = this match {
+    case DrawCard() => ???
+    case All(filters, effects) => {
+      val (own, enemy) = Filter.filter(filters, source, Game().currentPlayer, Game().opponent)
+      val all = own ++ enemy
+      all.foreach(minion => effects.foreach(_.applyOn(minion)()))
+      () => all.foreach(minion => effects.foreach(_.unApplyOn(minion)()))
+    }
+
+    case Choose(filters, effects) => {
+      val (own, enemy) = Filter.filter(filters, source, Game().currentPlayer, Game().opponent)
+      println
+      val selection = Util.playerConsoleInput("Vali sihtmärk: ", Seq(), own, enemy)
+      if (selection != None) {
+        println("Sihtmärgiks valiti: " + selection.get)
+        effects.foreach(_.applyOn(selection.get.cardType.asInstanceOf[MinionCard])())
+        () => effects.foreach(_.unApplyOn(selection.get.cardType.asInstanceOf[MinionCard])())
+      } else {
+        ???
+      }
+    }
+    case Random(filters, effects) => {
+      val (own, enemy) = Filter.filter(filters, source, Game().currentPlayer, Game().opponent)
+      val selection = Util.randomInput(Seq(), own, enemy)
+      if (selection != None) {
+        println("Sihtmärgiks valiti: " + selection.get)
+        effects.foreach(_.applyOn(selection.get.cardType.asInstanceOf[MinionCard])())
+        () => effects.foreach(_.unApplyOn(selection.get.cardType.asInstanceOf[MinionCard])())
+      } else {
+        ???
+      }
+    }
+  }
+}
 
 object EventEffect {
   val effectRegex = "\\(?(\\S+) \\[(.*?)\\] \\[(.*?)\\]\\)?".r
@@ -50,8 +86,8 @@ object EventEffect {
           case "Choose" => Some(Choose(filters, effects))
           case "Random" => Some(Random(filters, effects))
           case _ => None
-        }
       }
+        }
       case _ => {
         None
       }
@@ -68,27 +104,42 @@ case class Random(filter: Seq[Filter], effect: Seq[CreatureEffect]) extends Even
 case class DrawCard() extends EventEffect
 
 sealed trait CreatureEffect {
-  def applyOn(card: Card) = {
-    if (!card.cardType.isInstanceOf[MinionCard]) {
-      throw new IllegalArgumentException("CreatureEffect can only be applied on creatures")
-    }
-    val minion = card.cardType.asInstanceOf[MinionCard]
+  def applyOn(minion: MinionCard): (() => Unit) = {
     this match {
       case Health(changeType: ChangeType, change: Int) => {
         changeType match {
-          case Relative() => minion.relativeHp(change)
-          case Absolute() => minion.setHp(change)
-        }
-        //Where to resolve events?
+          case Relative() => (() => minion.relativeHp(change))
+          case Absolute() => (() => minion.setHp(change))
       }
+        }
       case Attack(changeType: ChangeType, change: Int) => {
         changeType match {
-          case Relative() => minion.relativeHp(change)
-          case Absolute() => minion.setHp(change)
-        }
+          case Relative() => (() => minion.relativeAtt(change))
+          case Absolute() => (() => minion.setAtt(change))
       }
+        }
       case Taunt(taunt: Boolean) => {
-        minion.taunt = taunt
+        (() => minion.dynTaunt = taunt)
+      }
+    }
+  }
+
+  def unApplyOn(minion: MinionCard): (() => Unit) = {
+    this match {
+      case Health(changeType: ChangeType, change: Int) => {
+        changeType match {
+          case Relative() => (() => minion.buffHp(-change))
+          case Absolute() => (() => throw new UnsupportedOperationException("Can't undo absolute hp change"))
+      }
+        }
+      case Attack(changeType: ChangeType, change: Int) => {
+        changeType match {
+          case Relative() => (() => minion.buffHp(-change))
+          case Absolute() => (() => throw new UnsupportedOperationException("Can't undo absolute att change"))
+      }
+        }
+      case Taunt(taunt: Boolean) => {
+        (() => minion.dynTaunt = minion.taunt)
       }
     }
   }

@@ -1,6 +1,7 @@
 package model
 
 import game.Card
+import game.MinionCard
 import scala.collection.mutable.MutableList
 import scala.util.Random
 
@@ -43,8 +44,8 @@ object Util {
     res.toList
   }
 
-  def playerInput(str: String, hand: Seq[Card], ownMinions: Seq[Card], enemyMinions: Seq[Card]): Option[Card] = {
-    val all = hand ++ ownMinions ++ enemyMinions
+  def playerConsoleInput(str: String, hand: Seq[Card], ownMinions: Seq[MinionCard], enemyMinions: Seq[MinionCard]): Option[Card] = {
+    val all = hand ++ ownMinions.map(_.parent) ++ enemyMinions.map(_.parent)
     if (all.isEmpty) {
       None
     }
@@ -72,8 +73,8 @@ object Util {
     }
   }
 
-  def randomInput(hand: Seq[Card], ownMinions: Seq[Card], enemyMinions: Seq[Card]): Option[Card] = {
-    val all = hand ++ ownMinions ++ enemyMinions
+  def randomInput(hand: Seq[Card], ownMinions: Seq[MinionCard], enemyMinions: Seq[MinionCard]): Option[Card] = {
+    val all = hand ++ ownMinions.map(_.parent) ++ enemyMinions.map(_.parent)
     if (all.isEmpty) {
       None
     }

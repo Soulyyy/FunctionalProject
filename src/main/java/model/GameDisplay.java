@@ -7,23 +7,23 @@ import scala.collection.JavaConversions;
 
 public class GameDisplay {
 
-	CardDisplay[] hand;
+	String[] hand;
 	int lifeTotal;
 	int opponentLife;
 	int opponentHandSize;
 
 	public GameDisplay(Game game) {
-		List<CardDisplay> cards = new ArrayList<>();
+		List<String> cards = new ArrayList<>();
 		for(Card c : JavaConversions.asJavaIterable(game.currentPlayer().hand().values())) {
-			cards.add(new CardDisplay(c));
+			cards.add(c.toString());
 		}
-		hand = cards.toArray(new CardDisplay[0]);
+		hand = cards.toArray(new String[0]);
 		lifeTotal = game.currentPlayer().getHealth();
 		opponentLife = game.opponent().getHealth();
 		opponentHandSize = game.opponent().hand().size();
 	}
 
-	public CardDisplay[] getHand() {
+	public String[] getHand() {
 		return hand;
 	}
 
