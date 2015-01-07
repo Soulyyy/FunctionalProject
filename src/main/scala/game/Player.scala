@@ -24,13 +24,13 @@ class Player(val name: String, deck: Deck) {
 
   def drawCard(): Unit = {
     if (cards.isEmpty) {
-      println("Fatigue " + fatigue)
+      println("Pakk on tühi, kangelane kaotab " + fatigue + " elupunkti")
       hero.relativeHp(-fatigue)
 
       fatigue += 1
     } else {
       val drawCard = cards.pop
-      println("Card draw: " + drawCard)
+      println("Pakist võeti: " + drawCard)
       hand += drawCard.id -> drawCard
     }
   }
@@ -132,9 +132,11 @@ class Player(val name: String, deck: Deck) {
     mana = maxMana
 
     println
-    println("Player " + name + " turn")
+    println("---------------------------------------")
+    println("Mängija " + name + " kord")
 
     drawCard
+    Game().popDamageQueue
     Game().popDeathQueue
 
     //Reset move counters
@@ -144,20 +146,31 @@ class Player(val name: String, deck: Deck) {
     var endTurn = false
     while (!endTurn) {
       println
-      println("Mana: " + mana)
-      val selection = Util.playerConsoleInput("Vali kaart mida mängida: ", hand.values.toSeq, board.values.toSeq, Seq())
+      println("Tegutsemispunkte: " + mana)
+      val selection = Util.playerConsoleInput("Vali kaart mida mängida, väära valiku puhul käik lõpetatakse: ", hand.values.toSeq, board.values.toSeq, Game().opponentOf(this).board.values.toSeq)
       selection match {
         case Some(card: Card) => {
           if (hand.contains(card.id)) {
             playCard(card.id)
-          } else {
+          } else if (board.contains(card.id)) {
             attack(card.cardType.asInstanceOf[MinionCard])
+          } else {
+            println("Vastase kaartidega ei saa mängida")
           }
         }
         case _ => endTurn = true
       }
       Game().popDamageQueue
       Game().popDeathQueue
+
+      if (Game().opponentOf(this).getHealth <= 0) {
+        if (getHealth > 0) {
+          Game().end(Some(this))
+        } else {
+          None
+        }
+        endTurn = true
+      }
     }
   }
 }

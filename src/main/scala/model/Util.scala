@@ -51,24 +51,28 @@ object Util {
     }
 
     if (!enemyMinions.isEmpty) {
-      println("Enemy Board:\n" + enemyMinions.map(_.toString).mkString("\n"))
+      println("Vastase laud:\n" + enemyMinions.map(_.toString).mkString("\t", "\n\t", ""))
     }
     if (!ownMinions.isEmpty) {
-      println("Own Board:\n" + ownMinions.map(_.toString).mkString("\n"))
+      println("Oma laud:\n" + ownMinions.map(_.toString).mkString("\t", "\n\t", ""))
     }
     if (!hand.isEmpty) {
-      println("Hand:\n" + hand.map(_.toString).mkString("\n"))
+      println("Käsi:\n" + hand.map(_.toString).mkString("\t", "\n\t", ""))
     }
 
     print(str)
-    val choice = io.StdIn.readInt
+    try {
+      val choice = io.StdIn.readInt
 
-    val card = all.filter(_.id == choice)
+      val card = all.filter(_.id == choice)
 
-    if (!card.exists(_.id == choice)) {
-      None
-    } else {
-      Some(card(0))
+      if (!card.exists(_.id == choice)) {
+        None
+      } else {
+        Some(card(0))
+      }
+    } catch {
+      case _: Throwable => None
     }
   }
 

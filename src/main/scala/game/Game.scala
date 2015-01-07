@@ -14,14 +14,18 @@ class Game(player1: Player, player2: Player) {
   val untilDeathCreatures = new HashMap[Int, MinionCard]
 
   def popDeathQueue(): Unit = {
-    println("Death queue: " + deathQueue)
+    if (!deathQueue.isEmpty) {
+      println("Suremise järjekord: " + deathQueue)
+    }
     deathQueue.foreach(_.onDeath)
     deathQueue.foreach(minion => minion.owner.get.board -= minion.id)
     deathQueue.clear
   }
 
   def popDamageQueue(): Unit = {
-    println("Damage queue: " + damageQueue)
+    if (!damageQueue.isEmpty) {
+      println("Vigastuste järjekord: " + damageQueue)
+    }
     damageQueue.foreach(_.onDamage)
     damageQueue.clear
   }
@@ -42,33 +46,9 @@ class Game(player1: Player, player2: Player) {
 
   def registerInputHandler() = ???
 
-  def currentHand(): String = {
-    var hand = currentPlayer.hand
-
-    "tere"
-  }
-
   def opponentHandSize(): Int = {
-    val handSize = opponent.hand.size
-    handSize
+    opponent.hand.size
   }
-
-  def currentBoard: String = {
-    "tere"
-  }
-
-  /*  def play = {
-    while(true) {
-      currentPlayer.drawCard()
-      var input : Int =scala.io.StdIn.readInt()
-      while(input != 700) {
-        input  = scala.io.StdIn.readInt()
-        println(state)
-
-
-      }
-    }
-  }*/
 
   def endTurn(): Unit = {
     switchPriority

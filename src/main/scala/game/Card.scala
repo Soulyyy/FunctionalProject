@@ -148,7 +148,7 @@ case class MinionCard(effects: Seq[Effect], private var health: Int, private var
   }
 
   def onDeath(): Unit = {
-    deathEffects.foreach(f => { f(); println(f) })
+    deathEffects.foreach(_())
   }
 }
 
