@@ -51,7 +51,7 @@ class Player(val name: String, deck: Deck) {
       minion.owner = Some(this)
       board += card.id -> minion
 
-      println("Effects: "+minion.effects)
+      println("Effects: " + minion.effects)
 
       minion.effects.filter(_.isInstanceOf[OnDamage]).flatMap(_.effects).foreach(f => {
         minion.damageEffects += (() => applyEffect(f, card))
@@ -156,6 +156,7 @@ class Player(val name: String, deck: Deck) {
         }
         case _ => endTurn = true
       }
+      Game().popDamageQueue
       Game().popDeathQueue
     }
   }

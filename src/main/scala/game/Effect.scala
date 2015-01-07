@@ -134,7 +134,7 @@ sealed trait CreatureEffect {
         }
       case Attack(changeType: ChangeType, change: Int) => {
         changeType match {
-          case Relative() => (() => minion.buffHp(-change))
+          case Relative() => (() => minion.buffAtt(-change))
           case Absolute() => (() => throw new UnsupportedOperationException("Can't undo absolute att change"))
       }
         }

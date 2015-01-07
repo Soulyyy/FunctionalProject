@@ -90,6 +90,20 @@ case class MinionCard(effects: Seq[Effect], private var health: Int, private var
       throw new IllegalStateException("Card must have owner")
     }
 
+    //If a buff such as stormwind expires, don't kill the minion
+    if (getHealth + change > 0) {
+      dynHealth += change
+    }
+  }
+
+  def buffAtt(change: Int): Unit = {
+    if (owner == None) {
+      throw new IllegalStateException("Card must have owner")
+    }
+
+    if (getAttack + change >= 0) {
+      dynAttack += change
+    }
   }
 
   def relativeAtt(change: Int): Unit = {
@@ -134,7 +148,7 @@ case class MinionCard(effects: Seq[Effect], private var health: Int, private var
   }
 
   def onDeath(): Unit = {
-    deathEffects.foreach(_())
+    deathEffects.foreach(f => { f(); println(f) })
   }
 }
 
