@@ -14,12 +14,14 @@ class Game(player1: Player, player2: Player) {
   val untilDeathCreatures = new HashMap[Int, MinionCard]
 
   def popDeathQueue(): Unit = {
+    println("Death queue: " + deathQueue)
     deathQueue.foreach(_.onDeath)
     deathQueue.foreach(minion => minion.owner.get.board -= minion.id)
     deathQueue.clear
   }
 
   def popDamageQueue(): Unit = {
+    println("Damage queue: " + damageQueue)
     damageQueue.foreach(_.onDamage)
     damageQueue.clear
   }

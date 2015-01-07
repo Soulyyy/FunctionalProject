@@ -66,7 +66,6 @@ object Util {
     val card = all.filter(_.id == choice)
 
     if (!card.exists(_.id == choice)) {
-      println("Invalid Choice")
       None
     } else {
       Some(card(0))

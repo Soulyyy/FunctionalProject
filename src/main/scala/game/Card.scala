@@ -77,7 +77,7 @@ case class MinionCard(effects: Seq[Effect], private var health: Int, private var
     //Killed only on first change to negative, avoid multiple deathreattle
     if (change < 0) {
       Game().damageQueue += this
-      if (getHealth <= 0) {
+      if (getHealth > 0 && getHealth + change <= 0) {
         Game().deathQueue += this
       }
     }
